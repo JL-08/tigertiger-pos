@@ -1,15 +1,13 @@
-FROM node:14-alpine
-
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
+FROM node:16-alpine
 
 WORKDIR /usr/src/app
 
-COPY package.json package-lock.json ./
-RUN npm install
-COPY  . .
+COPY package*.json ./
 
-ENV PORT 3000
-ENV PORT 9229
+RUN npm install --legacy-peer-deps
 
-CMD ["npm", "run", "start:dev"]
+COPY . .
+
+RUN npm run build
+
+CMD ["node", "dist/main"]
