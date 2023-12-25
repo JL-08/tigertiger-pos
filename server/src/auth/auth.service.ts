@@ -1,10 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { compareSync, hashSync } from 'bcryptjs';
-import { UsersDTO } from 'src/users/dto/create-user.dto';
+import { CreateUsersDTO } from 'src/users/dto/create-user.dto';
 import { validate } from 'class-validator';
 import { LoggerService } from 'src/logger/logger.service';
 import { UsersService } from 'src/users/users.service';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -19,9 +20,7 @@ export class AuthService {
     let isOk = false;
 
     // Transform body into DTO
-    const userDTO = new UsersDTO();
-    userDTO.email = user.email;
-    userDTO.password = user.password;
+    const userDTO = new CreateUsersDTO(user);
 
     // TODO: Refactor this section with try catch block and return error message in the catch block
     // Validate DTO against validate function from class-validator
@@ -62,36 +61,10 @@ export class AuthService {
     }
   }
 
-  async register(body: any): Promise<Record<string, any>> {
-    // Validation Flag
-    let isOk = false;
+  async register(createUserDto: CreateUsersDTO): Promise<User> {
+    const userDTO = new CreateUsersDTO(createUserDto);
+    userDTO.password = hashSync(createUserDto.password, 10);
 
-    // Transform body into DTO
-    const userDTO = new UsersDTO();
-    userDTO.email = body.email;
-    userDTO.name = body.name;
-    userDTO.password = hashSync(body.password, 10);
-
-    // Validate DTO against validate function from class-validator
-    await validate(userDTO).then((errors) => {
-      if (errors.length > 0) {
-        this.logger.debug(`${errors}`);
-      } else {
-        isOk = true;
-      }
-    });
-    if (isOk) {
-      await this.userservice.create(userDTO).catch((error) => {
-        this.logger.debug(error.message);
-        isOk = false;
-      });
-      if (isOk) {
-        return { status: 201, content: { msg: 'User created with success' } };
-      } else {
-        return { status: 400, content: { msg: 'User already exists' } };
-      }
-    } else {
-      return { status: 400, content: { msg: 'Invalid content' } };
-    }
+    return await this.userservice.create(userDTO);
   }
 }

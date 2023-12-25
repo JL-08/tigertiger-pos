@@ -1,15 +1,21 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString, Matches, MinLength } from 'class-validator';
+import { Role } from '../enums/role.enum';
+import { CreateBaseDTO } from 'src/shared/base.dto';
 
-export class UsersDTO {
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
-
-  @IsOptional()
-  @IsString()
-  name?: string;
-
+export class CreateUsersDTO extends CreateBaseDTO<CreateUsersDTO> {
   @IsNotEmpty()
   @IsString()
+  @MinLength(3, { message: 'Username should be a minimum of 3 characters.' })
+  userName: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @Matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/, {
+    message: 'Password should be a minimum of eight characters and has at least one letter and one number.',
+  })
   password: string;
+
+  @IsNotEmpty()
+  @IsEnum(Role)
+  role: Role;
 }

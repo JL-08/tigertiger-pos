@@ -1,19 +1,15 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { Column, Entity, Unique } from 'typeorm';
 import { Role } from '../enums/role.enum';
+import { AbstractEntity } from 'src/shared/abstract.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity()
-@Unique(['email'])
-export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+@Unique(['userName'])
+export class User extends AbstractEntity<User> {
   @Column()
-  name: string;
+  userName: string;
 
-  @Column()
-  email: string;
-
-  @Column()
+  @Column({ select: false })
   password: string;
 
   @Column({ default: true })
@@ -24,5 +20,5 @@ export class User {
     enum: Role,
     default: Role.employee,
   })
-  roles: Role[];
+  role: Role;
 }
