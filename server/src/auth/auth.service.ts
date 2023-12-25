@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { ConflictException, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { compareSync, hashSync } from 'bcryptjs';
 import { CreateUsersDTO } from 'src/users/dto/create-user.dto';
@@ -62,6 +62,10 @@ export class AuthService {
   }
 
   async register(createUserDto: CreateUsersDTO): Promise<User> {
+    var existingUser = await this.userservice.findOne(createUserDto.username);
+
+    if (existingUser) throw new ConflictException('User with this username already exists');
+
     const userDTO = new CreateUsersDTO(createUserDto);
     userDTO.password = hashSync(createUserDto.password, 10);
 

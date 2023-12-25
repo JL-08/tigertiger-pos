@@ -18,10 +18,9 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  findOne(email: string): Promise<User> {
+  findOne(username: string): Promise<User> {
     return this.usersRepository.findOne({
-      // @ts-ignore
-      email: email,
+      where: { username },
     });
   }
 
