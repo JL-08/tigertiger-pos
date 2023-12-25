@@ -1,13 +1,17 @@
 import { IsEnum, IsNotEmpty, IsString, Matches, MinLength } from 'class-validator';
 import { Role } from '../enums/role.enum';
 import { CreateBaseDTO } from 'src/shared/base.dto';
+import { ApiProperty } from '@nestjs/swagger';
+import { Exclude } from 'class-transformer';
 
 export class CreateUsersDTO extends CreateBaseDTO<CreateUsersDTO> {
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   @MinLength(3, { message: 'Username should be a minimum of 3 characters.' })
-  userName: string;
+  username: string;
 
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   @Matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/, {
@@ -15,6 +19,7 @@ export class CreateUsersDTO extends CreateBaseDTO<CreateUsersDTO> {
   })
   password: string;
 
+  @ApiProperty()
   @IsNotEmpty()
   @IsEnum(Role)
   role: Role;
