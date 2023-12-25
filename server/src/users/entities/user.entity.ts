@@ -4,10 +4,10 @@ import { AbstractEntity } from 'src/shared/abstract.entity';
 import { Exclude } from 'class-transformer';
 
 @Entity()
-@Unique(['userName'])
+@Unique(['username'])
 export class User extends AbstractEntity<User> {
   @Column()
-  userName: string;
+  username: string;
 
   @Column({ select: false })
   password: string;
