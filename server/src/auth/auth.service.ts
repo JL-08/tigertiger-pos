@@ -1,11 +1,13 @@
-import { ConflictException, Injectable, Logger } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { compareSync, hashSync } from 'bcryptjs';
-import { CreateUsersDTO } from 'src/users/dto/create-user.dto';
+import { CreateUserDTO } from 'src/users/dto/create-user.dto';
 import { validate } from 'class-validator';
 import { LoggerService } from 'src/logger/logger.service';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/entities/user.entity';
+import { LoginUserDTO } from 'src/users/dto/login-user.dto';
+import { UserLogin } from 'src/users/interfaces/user-login.interface';
 
 @Injectable()
 export class AuthService {
@@ -15,59 +17,31 @@ export class AuthService {
     private userservice: UsersService,
   ) {}
 
-  async login(user: any): Promise<Record<string, any>> {
-    // Validation Flag
-    let isOk = false;
+  async login(loginUserDto: LoginUserDTO): Promise<UserLogin> {
+    const userDTO = new LoginUserDTO(loginUserDto);
 
-    // Transform body into DTO
-    const userDTO = new CreateUsersDTO(user);
+    var existingUser = await this.userservice.findOne(userDTO.username);
 
-    // TODO: Refactor this section with try catch block and return error message in the catch block
-    // Validate DTO against validate function from class-validator
-    await validate(userDTO).then((errors) => {
-      if (errors.length > 0) {
-        this.logger.debug(`${errors}`);
-      } else {
-        isOk = true;
-      }
-    });
+    if (!existingUser) throw new ConflictException('User does not exist');
+    const isValid = compareSync(userDTO.password, existingUser.password);
 
-    if (isOk) {
-      // Get user information
-      const userDetails = await this.userservice.findOne(user.email);
+    if (isValid) {
+      var accessToken = this.jwtService.sign({ username: existingUser.username });
+      var userLogin: UserLogin = { username: existingUser.username, role: existingUser.role, token: accessToken };
 
-      // Check if user exists
-      if (userDetails == null) {
-        return { status: 401, msg: { msg: 'Invalid credentials' } };
-      }
-
-      // Check if the given password match with saved password
-      const isValid = compareSync(user.password, userDetails.password);
-      if (isValid) {
-        // Generate JWT token
-        return {
-          status: 200,
-          msg: {
-            email: user.email,
-            access_token: this.jwtService.sign({ email: user.email }),
-          },
-        };
-      } else {
-        // Password or email does not match
-        return { status: 401, msg: { msg: 'Invalid credentials' } };
-      }
-    } else {
-      return { status: 400, msg: { msg: 'Invalid fields.' } };
+      return userLogin;
     }
+
+    throw new UnauthorizedException('Invalid Credentials');
   }
 
-  async register(createUserDto: CreateUsersDTO): Promise<User> {
-    var existingUser = await this.userservice.findOne(createUserDto.username);
+  async register(createUserDto: CreateUserDTO): Promise<User> {
+    const userDTO = new CreateUserDTO(createUserDto);
+    var existingUser = await this.userservice.findOne(userDTO.username);
 
     if (existingUser) throw new ConflictException('User with this username already exists');
 
-    const userDTO = new CreateUsersDTO(createUserDto);
-    userDTO.password = hashSync(createUserDto.password, 10);
+    userDTO.password = hashSync(userDTO.password, 10);
 
     return await this.userservice.create(userDTO);
   }
