@@ -1,6 +1,4 @@
-import { IsDate, IsNumber } from 'class-validator';
-
-export class CreateBaseDTO<T> {
+export class BaseDTO<T> {
   constructor(dto: Partial<T>) {
     Object.assign(this, dto);
   }

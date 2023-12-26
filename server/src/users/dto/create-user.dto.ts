@@ -1,10 +1,9 @@
 import { IsEnum, IsNotEmpty, IsString, Matches, MinLength } from 'class-validator';
 import { Role } from '../enums/role.enum';
-import { CreateBaseDTO } from 'src/shared/base.dto';
+import { BaseDTO } from 'src/shared/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { Exclude } from 'class-transformer';
 
-export class CreateUsersDTO extends CreateBaseDTO<CreateUsersDTO> {
+export class CreateUserDTO extends BaseDTO<CreateUserDTO> {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
