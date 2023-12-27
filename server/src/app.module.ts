@@ -6,7 +6,6 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { RolesModule } from './roles/roles.module';
 import configuration from './config';
 
 @Module({
@@ -23,7 +22,6 @@ import configuration from './config';
     ScheduleModule.forRoot(),
     AuthModule,
     UsersModule,
-    RolesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
