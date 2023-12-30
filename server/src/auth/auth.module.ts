@@ -17,9 +17,9 @@ import { LoggerModule } from 'src/logger/logger.module';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        privateKey: configService.get<string>('keys.privateKey'),
-        publicKey: configService.get<string>('keys.publicKey'),
-        signOptions: { expiresIn: '60s', algorithm: 'RS256' },
+        privateKey: configService.get('PRIVATE_KEY'),
+        publicKey: configService.get('PUBLIC_KEY'),
+        signOptions: { expiresIn: '3600s', algorithm: 'RS256' },
       }),
       inject: [ConfigService],
     }),
