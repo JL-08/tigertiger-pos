@@ -14,7 +14,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ stopAtFirstError: true }));
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
-  const config = new DocumentBuilder().setTitle('TigerTiger POS').setVersion('1.0').addTag('api').build();
+  const config = new DocumentBuilder().setTitle('TigerTiger POS').setVersion('1.0').addTag('api').addBearerAuth().build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
