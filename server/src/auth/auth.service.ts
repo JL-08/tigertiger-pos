@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { compareSync, hashSync } from 'bcryptjs';
 import { CreateUserDTO } from 'src/users/dto/create-user.dto';
@@ -17,12 +17,10 @@ export class AuthService {
   ) {}
 
   async login(loginUserDto: LoginUserDTO): Promise<UserLogin> {
-    const userDTO = new LoginUserDTO(loginUserDto);
+    var existingUser = await this.userservice.findOne(loginUserDto.username);
 
-    var existingUser = await this.userservice.findOne(userDTO.username);
-
-    if (!existingUser) throw new ConflictException('User does not exist');
-    const isValid = compareSync(userDTO.password, existingUser.password);
+    if (!existingUser) throw new NotFoundException('User does not exist');
+    const isValid = compareSync(loginUserDto.password, existingUser.password);
 
     if (isValid) {
       var accessToken = this.jwtService.sign({ username: existingUser.username });
@@ -35,13 +33,14 @@ export class AuthService {
   }
 
   async register(createUserDto: CreateUserDTO): Promise<User> {
-    const userDTO = new CreateUserDTO(createUserDto);
-    var existingUser = await this.userservice.findOne(userDTO.username);
+    createUserDto.password = hashSync(createUserDto.password, 10);
 
-    if (existingUser) throw new ConflictException('User with this username already exists');
-
-    userDTO.password = hashSync(userDTO.password, 10);
-
-    return await this.userservice.create(userDTO);
+    try {
+      return await this.userservice.create(createUserDto);
+    } catch (err) {
+      if (err.code === '23505') {
+        throw new ConflictException(`User ${createUserDto.username} already exists`);
+      }
+    }
   }
 }
