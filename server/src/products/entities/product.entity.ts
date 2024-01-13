@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { AbstractEntity } from 'src/shared/abstract.entity';
 import { Category } from 'src/categories/entities/category.entity';
 
@@ -19,7 +19,7 @@ export class Product extends AbstractEntity<Product> {
   @Column()
   image: string;
 
-  @OneToOne(() => Category)
+  @ManyToOne(() => Category, { onDelete: 'SET NULL', eager: true })
   @JoinColumn()
   category: Category;
 }

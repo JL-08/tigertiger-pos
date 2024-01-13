@@ -1,9 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, Validate } from 'class-validator';
-import { Category } from 'src/categories/entities/category.entity';
-import { BaseDTO } from 'src/shared/base.dto';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
 
-export class CreateProductDto extends BaseDTO<CreateProductDto> {
+export class CreateProductDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
@@ -25,8 +23,6 @@ export class CreateProductDto extends BaseDTO<CreateProductDto> {
   image: string;
 
   @ApiProperty()
-  @Validate((value) => value instanceof Category, {
-    message: 'Product category must be a valid Category entity.',
-  })
-  category: Category;
+  @IsUUID()
+  category: string;
 }
