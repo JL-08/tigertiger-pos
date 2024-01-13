@@ -39,8 +39,9 @@ export class AuthService {
       return await this.userservice.create(createUserDto);
     } catch (err) {
       if (err.code === '23505') {
-        throw new ConflictException(`User ${createUserDto.username} already exists`);
+        throw new ConflictException(`User "${createUserDto.username}" already exists`);
       }
+      throw err;
     }
   }
 }
