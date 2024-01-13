@@ -6,7 +6,7 @@ export class AbstractEntity<T> {
   }
 
   @PrimaryGeneratedColumn('uuid')
-  id: number;
+  id: string;
 
   @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   createdDate: Date;
