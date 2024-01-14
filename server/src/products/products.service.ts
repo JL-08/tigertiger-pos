@@ -6,6 +6,7 @@ import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
 import { Category } from 'src/categories/entities/category.entity';
 import { CategoriesService } from 'src/categories/categories.service';
+import { Price } from 'src/prices/entities/price.entity';
 
 @Injectable()
 export class ProductsService {
@@ -19,8 +20,9 @@ export class ProductsService {
     const existingCategory = await this.categoriesService.findOne(createProductDto.category);
     if (!existingCategory) throw new NotFoundException(`Category does not exist`);
 
+    const priceList: Price[] = createProductDto.prices.map((p) => new Price(p));
     try {
-      const product = new Product({ ...createProductDto, category: existingCategory });
+      const product = new Product({ ...createProductDto, category: existingCategory, prices: priceList });
       return await this.productsRepository.save(product);
     } catch (err) {
       if (err.code === '23505') {
