@@ -1,0 +1,34 @@
+
+.auth {
+  height: 100vh;
+  padding: rem(32);
+
+  &__box {
+    height: 100%;
+    box-shadow: 3px 5px 6px 5px #a8a8a8;
+    display: flex;
+  }
+
+  &__img {
+    width: 50%;
+
+    img {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  &__form {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffe5b273;
+  }
+
+  &__title {
+    color: $orange-1;
+    font-size: rem(62);
+  }
+}
