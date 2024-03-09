@@ -5,13 +5,13 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany, Unique } from 'typeor
 
 @Entity()
 export class Category extends AbstractEntity<Category> {
-  @Column({ nullable: false })
+  @Column()
   name: string;
 
-  @OneToMany(() => CategoryItem, (categoryItem) => categoryItem.category, { onDelete: 'SET NULL', eager: true, cascade: true })
+  @OneToMany(() => CategoryItem, (categoryItem) => categoryItem.category, { onDelete: 'CASCADE', eager: true, cascade: true })
   categoryItems: CategoryItem[];
 
-  @ManyToOne(() => Product, (product) => product.categories, { onDelete: 'SET NULL' })
+  @ManyToOne(() => Product, (product) => product.categories, { onDelete: 'CASCADE' })
   @JoinColumn()
   product: Product;
 }

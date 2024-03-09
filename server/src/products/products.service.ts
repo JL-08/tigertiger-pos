@@ -1,13 +1,12 @@
-import { BadRequestException, ConflictException, HttpException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
-import { Group } from 'src/groups/entities/group.entity';
 import { GroupsService } from 'src/groups/groups.service';
-import { Price } from 'src/prices/entities/price.entity';
 import { Category } from 'src/categories/entities/category.entity';
+import { Group } from 'src/groups/entities/group.entity';
 
 @Injectable()
 export class ProductsService {
@@ -19,7 +18,7 @@ export class ProductsService {
 
   async create(createProductDto: CreateProductDto) {
     const existingGroup = await this.groupsService.findOne(createProductDto.group);
-    if (!existingGroup) throw new NotFoundException(`Group does not exist`);
+    if (!existingGroup) throw new NotFoundException('Group does not exist');
 
     if ((createProductDto.categories && createProductDto.price) || (!createProductDto.categories && !createProductDto.price))
       throw new BadRequestException('Product should either have a price or an assigned category');
@@ -39,20 +38,22 @@ export class ProductsService {
   }
 
   async findAll() {
-    return await this.productsRepository.find({ where: { deletedDate: null } });
+    return await this.productsRepository.find();
   }
 
   async findOne(id: string) {
-    return await this.productsRepository.findOne({ where: { id: id } });
+    return await this.productsRepository.findOne({ where: { id } });
   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {
-    const existingProduct = await this.productsRepository.findOne({ where: { id: id }, relations: { categories: true } });
+    const existingProduct = await this.productsRepository.findOne({ where: { id } });
     if (!existingProduct) throw new NotFoundException('Product does not exist');
 
-    const group = updateProductDto.group ?? existingProduct.group.id;
-    const existingGroup = await this.groupsService.findOne(group);
-    if (!existingGroup) throw new NotFoundException('Group does not exist');
+    let existingGroup: Group | null = null;
+    if (updateProductDto.group) {
+      existingGroup = await this.groupsService.findOne(updateProductDto.group);
+      if (!existingGroup) throw new NotFoundException('Group does not exist');
+    }
 
     if ((updateProductDto.categories && updateProductDto.price) || (!updateProductDto.categories && !updateProductDto.price))
       throw new BadRequestException('Product should either have a price or an assigned category');
@@ -60,7 +61,6 @@ export class ProductsService {
     let categoryList: Category[] | null = null;
     if (updateProductDto.categories) {
       categoryList = updateProductDto.categories.map((c) => new Category(c));
-      existingProduct.price = null;
     }
 
     const updateProduct = {
@@ -68,11 +68,9 @@ export class ProductsService {
       ...updateProductDto,
       categories: categoryList,
       group: existingGroup,
-      modifiedDate: new Date(),
-      version: existingProduct.version + 1,
     };
 
-    await this.productsRepository.update(id, updateProduct);
+    await this.productsRepository.save(updateProduct);
 
     return updateProduct;
   }
@@ -81,14 +79,7 @@ export class ProductsService {
     const existingProduct = await this.findOne(id);
     if (!existingProduct) throw new NotFoundException('Product does not exist');
 
-    const deleteProduct = {
-      ...existingProduct,
-      modifiedDate: new Date(),
-      version: existingProduct.version + 1,
-      deletedDate: new Date(),
-    };
-
-    await this.productsRepository.update(id, deleteProduct);
+    await this.productsRepository.softDelete(id);
 
     return [];
   }

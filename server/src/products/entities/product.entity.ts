@@ -24,7 +24,7 @@ export class Product extends AbstractEntity<Product> {
   @Column({ nullable: true })
   discount: number;
 
-  @OneToMany(() => Category, (category) => category.product, { onDelete: 'SET NULL', eager: true, cascade: true })
+  @OneToMany(() => Category, (category) => category.product, { onDelete: 'CASCADE', eager: true, cascade: true })
   @JoinColumn()
   categories: Category[];
 

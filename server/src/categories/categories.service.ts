@@ -22,11 +22,11 @@ export class CategoriesService {
   }
 
   async findAll() {
-    return await this.categoriesRepository.find({ where: { deletedDate: null } });
+    return await this.categoriesRepository.find();
   }
 
   async findOne(id: string) {
-    return await this.categoriesRepository.findOne({ where: { id: id } });
+    return await this.categoriesRepository.findOne({ where: { id } });
   }
 
   async update(id: string, updateCategoryDto: UpdateCategoryDto) {
@@ -36,8 +36,6 @@ export class CategoriesService {
     const updateCategory = {
       ...existingCategory,
       ...updateCategoryDto,
-      modifiedDate: new Date(),
-      version: existingCategory.version + 1,
     };
 
     await this.categoriesRepository.update(id, updateCategory);
@@ -49,14 +47,7 @@ export class CategoriesService {
     const existingCategory = await this.findOne(id);
     if (!existingCategory) throw new NotFoundException('Category does not exist');
 
-    const deleteProduct = {
-      ...existingCategory,
-      modifiedDate: new Date(),
-      version: existingCategory.version + 1,
-      deletedDate: new Date(),
-    };
-
-    await this.categoriesRepository.update(id, deleteProduct);
+    await this.categoriesRepository.softDelete(id);
 
     return [];
   }

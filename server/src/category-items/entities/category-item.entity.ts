@@ -5,7 +5,7 @@ import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity()
 export class CategoryItem extends AbstractEntity<CategoryItem> {
-  @Column({ nullable: false })
+  @Column()
   name: string;
 
   @Column()
@@ -17,7 +17,7 @@ export class CategoryItem extends AbstractEntity<CategoryItem> {
   @Column({ nullable: true })
   discount: number;
 
-  @ManyToOne(() => Category, (category) => category.categoryItems, { onDelete: 'SET NULL' })
+  @ManyToOne(() => Category, (category) => category.categoryItems, { onDelete: 'CASCADE' })
   @JoinColumn()
   category: Category;
 }

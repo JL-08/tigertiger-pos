@@ -27,18 +27,18 @@ export class GroupsService {
   }
 
   async findOne(id: string) {
-    return await this.groupsRepository.findOne({ where: { id: id } });
+    return await this.groupsRepository.findOne({
+      where: { id },
+    });
   }
 
   async update(id: string, updateGroupDto: UpdateGroupDto) {
     const existingGroup = await this.findOne(id);
-    if (!existingGroup) throw new NotFoundException('Category does not exist');
+    if (!existingGroup) throw new NotFoundException('Group does not exist');
 
     const updateGroup = {
       ...existingGroup,
       ...updateGroupDto,
-      modifiedDate: new Date(),
-      version: existingGroup.version + 1,
     };
 
     try {
@@ -55,16 +55,9 @@ export class GroupsService {
 
   async remove(id: string) {
     const existingGroup = await this.findOne(id);
-    if (!existingGroup) throw new NotFoundException(`Group does not exist`);
+    if (!existingGroup) throw new NotFoundException('Group does not exist');
 
-    const deleteGroup = {
-      ...existingGroup,
-      modifiedDate: new Date(),
-      version: existingGroup.version + 1,
-      deletedDate: new Date(),
-    };
-
-    await this.groupsRepository.update(id, deleteGroup);
+    await this.groupsRepository.softDelete(id);
 
     return [];
   }
