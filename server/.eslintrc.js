@@ -18,7 +18,7 @@ module.exports = {
     indent: 'off',
     'no-console': 'warn',
     quotes: ['error', 'single'],
-    'linebreak-style': ['error', 'unix'],
+    'linebreak-style': 0,
     semi: ['error', 'always'],
     'comma-dangle': ['error', 'always-multiline'],
     '@typescript-eslint/interface-name-prefix': 'off',
