@@ -1,4 +1,4 @@
-import { Column, PrimaryGeneratedColumn } from 'typeorm';
+import { CreateDateColumn, DeleteDateColumn, PrimaryGeneratedColumn, UpdateDateColumn, VersionColumn } from 'typeorm';
 
 export class AbstractEntity<T> {
   constructor(entity: Partial<T>) {
@@ -8,15 +8,15 @@ export class AbstractEntity<T> {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
-  createdDate: Date;
+  @CreateDateColumn({ select: false })
+  createdAt: Date;
 
-  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
-  modifiedDate: Date;
+  @UpdateDateColumn({ select: false })
+  modifiedAt: Date;
 
-  @Column({ type: 'timestamptz', nullable: true })
-  deletedDate: Date;
+  @DeleteDateColumn({ select: false })
+  deletedAt: Date;
 
-  @Column({ default: 1 })
+  @VersionColumn({ select: false })
   version: number;
 }
