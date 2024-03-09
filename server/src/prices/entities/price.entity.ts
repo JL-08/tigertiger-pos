@@ -14,7 +14,7 @@ export class Price extends AbstractEntity<Price> {
   @Column()
   size: Size;
 
-  @ManyToOne(() => Product, (product) => product.prices, { onDelete: 'SET NULL' })
-  @JoinColumn()
-  product: Product;
+  // @ManyToOne(() => Product, (product) => product.prices, { onDelete: 'SET NULL' })
+  // @JoinColumn()
+  // product: Product;
 }

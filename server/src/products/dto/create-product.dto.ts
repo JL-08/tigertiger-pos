@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
-import { CreatePriceDto } from 'src/prices/dto/create-price.dto';
+import { Category } from 'src/categories/entities/category.entity';
 
 export class CreateProductDto {
   @ApiProperty()
@@ -15,9 +15,19 @@ export class CreateProductDto {
 
   @ApiProperty()
   @IsUUID()
-  category: string;
+  group: string;
 
   @ApiProperty()
-  @IsNotEmpty()
-  prices: CreatePriceDto[];
+  @IsOptional()
+  @IsNumber()
+  price: number;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsNumber()
+  discount: number;
+
+  @ApiProperty()
+  @IsOptional()
+  categories: Category[];
 }

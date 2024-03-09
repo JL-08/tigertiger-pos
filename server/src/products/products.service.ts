@@ -1,28 +1,34 @@
-import { ConflictException, HttpException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, HttpException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
-import { Category } from 'src/categories/entities/category.entity';
-import { CategoriesService } from 'src/categories/categories.service';
+import { Group } from 'src/groups/entities/group.entity';
+import { GroupsService } from 'src/groups/groups.service';
 import { Price } from 'src/prices/entities/price.entity';
+import { Category } from 'src/categories/entities/category.entity';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectRepository(Product)
     private readonly productsRepository: Repository<Product>,
-    private readonly categoriesService: CategoriesService,
+    private readonly groupsService: GroupsService,
   ) {}
 
   async create(createProductDto: CreateProductDto) {
-    const existingCategory = await this.categoriesService.findOne(createProductDto.category);
-    if (!existingCategory) throw new NotFoundException(`Category does not exist`);
+    const existingGroup = await this.groupsService.findOne(createProductDto.group);
+    if (!existingGroup) throw new NotFoundException(`Group does not exist`);
 
-    const priceList: Price[] = createProductDto.prices.map((p) => new Price(p));
+    if ((createProductDto.categories && createProductDto.price) || (!createProductDto.categories && !createProductDto.price))
+      throw new BadRequestException('Product should either have a price or an assigned category');
+
+    let categoryList: Category[] | null = null;
+    if (createProductDto.categories) categoryList = createProductDto.categories.map((c) => new Category(c));
+
     try {
-      const product = new Product({ ...createProductDto, category: existingCategory, prices: priceList });
+      const product = new Product({ ...createProductDto, group: existingGroup, categories: categoryList });
       return await this.productsRepository.save(product);
     } catch (err) {
       if (err.code === '23505') {
@@ -41,17 +47,27 @@ export class ProductsService {
   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {
-    const existingProduct = await this.findOne(id);
+    const existingProduct = await this.productsRepository.findOne({ where: { id: id }, relations: { categories: true } });
     if (!existingProduct) throw new NotFoundException('Product does not exist');
 
-    const category = updateProductDto.category ?? existingProduct.category.id;
-    const existingCategory = await this.categoriesService.findOne(category);
-    if (!existingCategory) throw new NotFoundException('Category does not exist');
+    const group = updateProductDto.group ?? existingProduct.group.id;
+    const existingGroup = await this.groupsService.findOne(group);
+    if (!existingGroup) throw new NotFoundException('Group does not exist');
+
+    if ((updateProductDto.categories && updateProductDto.price) || (!updateProductDto.categories && !updateProductDto.price))
+      throw new BadRequestException('Product should either have a price or an assigned category');
+
+    let categoryList: Category[] | null = null;
+    if (updateProductDto.categories) {
+      categoryList = updateProductDto.categories.map((c) => new Category(c));
+      existingProduct.price = null;
+    }
 
     const updateProduct = {
       ...existingProduct,
       ...updateProductDto,
-      category: existingCategory,
+      categories: categoryList,
+      group: existingGroup,
       modifiedDate: new Date(),
       version: existingProduct.version + 1,
     };

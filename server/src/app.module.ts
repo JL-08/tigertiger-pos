@@ -7,9 +7,11 @@ import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ProductsModule } from './products/products.module';
-import { CategoriesModule } from './categories/categories.module';
+import { GroupsModule } from './groups/groups.module';
 import { PricesModule } from './prices/prices.module';
 import { OrdersModule } from './orders/orders.module';
+import { CategoriesModule } from './categories/categories.module';
+import { CategoryItemsModule } from './category-items/category-items.module';
 import configuration from './config';
 
 @Module({
@@ -27,9 +29,11 @@ import configuration from './config';
     AuthModule,
     UsersModule,
     ProductsModule,
-    CategoriesModule,
+    GroupsModule,
     PricesModule,
     OrdersModule,
+    CategoriesModule,
+    CategoryItemsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
