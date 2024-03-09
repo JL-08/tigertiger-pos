@@ -38,7 +38,7 @@ export class CategoriesService {
       ...updateCategoryDto,
     };
 
-    await this.categoriesRepository.update(id, updateCategory);
+    await this.categoriesRepository.save(updateCategory);
 
     return updateCategory;
   }

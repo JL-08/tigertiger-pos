@@ -42,7 +42,7 @@ export class GroupsService {
     };
 
     try {
-      await this.groupsRepository.update(id, updateGroup);
+      await this.groupsRepository.save(updateGroup);
 
       return updateGroup;
     } catch (err) {
