@@ -15,6 +15,7 @@ export const appTheme: Theme = extendTheme({
           '700': '#745747',
           '800': '#624230',
           '900': '#512d19',
+          solidDisabledBg: '#c7b1a5',
         },
         // @ts-expect-error: define new color token
         secondary: {
