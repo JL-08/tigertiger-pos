@@ -17,19 +17,19 @@ export class AuthService {
   ) {}
 
   async login(loginUserDto: LoginUserDTO): Promise<UserLogin> {
-    var existingUser = await this.userservice.findOne(loginUserDto.username);
+    const existingUser = await this.userservice.findOne(loginUserDto.username);
 
-    if (!existingUser) throw new NotFoundException('User does not exist');
+    if (!existingUser) throw new NotFoundException('Invalid username or password');
     const isValid = compareSync(loginUserDto.password, existingUser.password);
 
     if (isValid) {
-      var accessToken = this.jwtService.sign({ username: existingUser.username });
-      var userLogin: UserLogin = { username: existingUser.username, role: existingUser.role, token: accessToken };
+      const accessToken = this.jwtService.sign({ username: existingUser.username });
+      const userLogin: UserLogin = { username: existingUser.username, role: existingUser.role, token: accessToken };
 
       return userLogin;
     }
 
-    throw new UnauthorizedException('Invalid Credentials');
+    throw new UnauthorizedException('Invalid username or password');
   }
 
   async register(createUserDto: CreateUserDTO): Promise<User> {
