@@ -2,9 +2,9 @@ import { Controller, Get, Post, Body, Param, Delete, UseGuards, Put } from '@nes
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { JwtAuthGuard } from 'src/auth/strategy/jwt-auth.guard';
+import { AccessTokenGuard } from 'src/auth/strategy/accessToken.guard';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(AccessTokenGuard)
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}

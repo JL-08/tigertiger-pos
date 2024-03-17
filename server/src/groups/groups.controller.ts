@@ -2,9 +2,9 @@ import { Controller, Get, Post, Body, Param, Delete, UseGuards, Put } from '@nes
 import { GroupsService } from './groups.service';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
-import { JwtAuthGuard } from 'src/auth/strategy/jwt-auth.guard';
+import { AccessTokenGuard } from 'src/auth/strategy/accessToken.guard';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(AccessTokenGuard)
 @Controller('groups')
 export class GroupsController {
   constructor(private readonly groupsService: GroupsService) {}

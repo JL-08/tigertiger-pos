@@ -4,11 +4,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { UsersModule } from 'src/users/users.module';
 import { AuthService } from './auth.service';
-import { JwtStrategy } from './strategy/jwt.strategy';
+import { AccessTokenStrategy } from './strategy/accessToken.strategy';
 import { AuthController } from './auth.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { LoggerModule } from 'src/logger/logger.module';
+import { RefreshTokenStrategy } from './strategy/refreshToken.strategy';
 
 @Module({
   imports: [
@@ -19,14 +20,13 @@ import { LoggerModule } from 'src/logger/logger.module';
       useFactory: (configService: ConfigService) => ({
         privateKey: configService.get('PRIVATE_KEY'),
         publicKey: configService.get('PUBLIC_KEY'),
-        signOptions: { expiresIn: '3600s', algorithm: 'RS256' },
       }),
       inject: [ConfigService],
     }),
     UsersModule,
     TypeOrmModule.forFeature([User]),
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy],
   exports: [AuthService, JwtModule, PassportModule],
   controllers: [AuthController],
 })

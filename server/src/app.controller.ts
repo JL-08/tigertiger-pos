@@ -1,10 +1,6 @@
-import { Body, Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Req, Res } from '@nestjs/common';
 import { AppService } from './app.service';
 import { AuthService } from './auth/auth.service';
-import { JwtAuthGuard } from './auth/strategy/jwt-auth.guard';
-import { RolesGuard } from './auth/strategy/roles.guard';
-import { Roles } from './custom.decorator';
-import { Role } from './users/enums/role.enum';
 
 @Controller()
 export class AppController {
