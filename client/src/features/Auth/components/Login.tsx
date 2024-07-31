@@ -2,39 +2,34 @@ import { Button, CircularProgress, FormLabel, Input, Stack } from '@mui/joy';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { Login as LoginInput } from '../types/Login';
 import { InputError } from '../../../components/InputError';
-import { useLoginMutation } from '../api/authApi';
-import { RequestError } from '../../../types/RequestError';
-import toast from 'react-hot-toast';
-import { Toast } from '../../../components/Toast';
+import useLoginService from '../services/useLoginService';
+import { useNavigate } from 'react-router-dom';
+import { TokenType } from '../types/TokenType';
+import { getToken } from '../../utils/authUtils';
 
 export const Login = () => {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginInput>();
+  const { loginService, isLoading } = useLoginService();
+  const token = getToken(TokenType.ACCESS);
 
-  const [login, { isLoading }] = useLoginMutation();
+  if (token) {
+    setTimeout(() => {
+      navigate('/', { replace: true });
+    }, 0);
+  }
 
   const onSubmit: SubmitHandler<LoginInput> = async (data) => {
-    console.log(data);
+    const isSuccess = await loginService(data);
 
-    const res = await login(data);
-
-    if ('error' in res && 'data' in res.error) {
-      const error = res.error.data as RequestError;
-
-      if (error.statusCode === 404 && !error.message.includes('Invalid')) {
-        throw new Error(error.message);
-      } else {
-        toast.custom(
-          <Toast
-            variant='error'
-            title='Error Logging-In'
-            message={error.message}
-          />
-        );
-      }
+    if (isSuccess) {
+      setTimeout(() => {
+        navigate('/', { replace: true });
+      }, 0);
     }
   };
 
