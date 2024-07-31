@@ -1,5 +1,4 @@
-import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
-import { useGetProfileQuery } from '../features/Auth/api/authApi';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import { Layout } from '../layouts/Layout';
 import { ProtectedRoute } from './ProtectedRoute';
 import { Auth } from '../pages/Auth';
@@ -14,7 +13,7 @@ export const AppRoutes = () => {
   const navigate = useNavigate();
   const token = getToken(TokenType.ACCESS);
   const isAuthenticated = token !== null;
-  console.log('isAuthenticated', isAuthenticated, token);
+
   if (!isAuthenticated && window.location.pathname !== '/auth') {
     setTimeout(() => {
       navigate('/auth', { replace: true });
