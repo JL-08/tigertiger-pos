@@ -26,7 +26,7 @@ export class AuthService {
 
     if (!isValid) throw new BadRequestException('Invalid username or password');
 
-    const tokens = await this.getTokens(existingUser.id, existingUser.username);
+    const tokens = await this.getTokens(existingUser);
     await this.updateRefreshToken(existingUser.id, tokens.refreshToken);
 
     const userLogin: UserLogin = {
@@ -64,12 +64,13 @@ export class AuthService {
     });
   }
 
-  async getTokens(userId: string, username: string) {
+  async getTokens(user: User) {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {
-          sub: userId,
-          username,
+          sub: user.id,
+          username: user.username,
+          role: user.role,
         },
         {
           secret: this.configService.get<string>('PUBLIC_KEY'),
@@ -78,8 +79,9 @@ export class AuthService {
       ),
       this.jwtService.signAsync(
         {
-          sub: userId,
-          username,
+          sub: user.id,
+          username: user.username,
+          role: user.role,
         },
         {
           secret: this.configService.get<string>('PUBLIC_KEY'),
@@ -102,8 +104,8 @@ export class AuthService {
     const refreshTokenMatches = compareSync(refreshToken, user.refreshToken);
     if (!refreshTokenMatches) throw new ForbiddenException('Access Denied');
 
-    const tokens = await this.getTokens(user.id, user.username);
+    const tokens = await this.getTokens(user);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
-    return tokens;
+    return { username: user.username, role: user.role, ...tokens };
   }
 }
