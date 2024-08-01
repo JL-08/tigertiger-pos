@@ -7,7 +7,7 @@ import {
 import { User } from '../types/User';
 import { Login } from '../types/Login';
 import { TokenType } from '../types/TokenType';
-import { getToken } from '../../utils/authUtils';
+import { getToken } from '../utils/authUtils';
 import { setUser, logout } from '../slices/authSlice';
 
 let isRefresh = false;

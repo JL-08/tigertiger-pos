@@ -5,7 +5,7 @@ import { InputError } from '../../../components/InputError';
 import useLoginService from '../services/useLoginService';
 import { useNavigate } from 'react-router-dom';
 import { TokenType } from '../types/TokenType';
-import { getToken } from '../../utils/authUtils';
+import { getToken } from '../../Auth/utils/authUtils';
 
 export const Login = () => {
   const navigate = useNavigate();

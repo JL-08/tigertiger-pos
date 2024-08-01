@@ -7,7 +7,7 @@ import { Order } from '../pages/Order';
 import { Error } from '../pages/Error';
 import { Login } from '../features/Auth/components/Login';
 import { TokenType } from '../features/Auth/types/TokenType';
-import { getToken } from '../features/utils/authUtils';
+import { getToken } from '../features/Auth/utils/authUtils';
 
 export const AppRoutes = () => {
   const navigate = useNavigate();
