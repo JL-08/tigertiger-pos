@@ -2,6 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'type
 import { AbstractEntity } from 'src/shared/abstract.entity';
 import { Group } from 'src/groups/entities/group.entity';
 import { Category } from 'src/categories/entities/category.entity';
+import { ValidateNested } from 'class-validator';
 
 @Entity()
 export class Product extends AbstractEntity<Product> {
@@ -18,7 +19,7 @@ export class Product extends AbstractEntity<Product> {
   // @JoinColumn()
   // prices: Price[];
 
-  @Column({ nullable: true })
+  @Column()
   price: number;
 
   @Column({ nullable: true })

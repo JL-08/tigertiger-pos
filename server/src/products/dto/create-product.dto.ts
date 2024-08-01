@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import { Type } from 'class-transformer';
+import { Allow, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, MaxLength, ValidateNested } from 'class-validator';
+import { CreateCategoryDto } from 'src/categories/dto/create-category.dto';
 import { Category } from 'src/categories/entities/category.entity';
 
 export class CreateProductDto {
@@ -18,7 +20,7 @@ export class CreateProductDto {
   group: string;
 
   @ApiProperty()
-  @IsOptional()
+  @IsNotEmpty()
   @IsNumber()
   price: number;
 
@@ -29,5 +31,7 @@ export class CreateProductDto {
 
   @ApiProperty()
   @IsOptional()
-  categories: Category[];
+  @ValidateNested({ each: true })
+  @Type(() => CreateCategoryDto)
+  categories: CreateCategoryDto[];
 }

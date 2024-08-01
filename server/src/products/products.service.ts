@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { GroupsService } from 'src/groups/groups.service';
 import { Category } from 'src/categories/entities/category.entity';
 import { Group } from 'src/groups/entities/group.entity';
+import { CategoryItem } from 'src/category-items/entities/category-item.entity';
 
 @Injectable()
 export class ProductsService {
@@ -20,11 +21,15 @@ export class ProductsService {
     const existingGroup = await this.groupsService.findOne(createProductDto.group);
     if (!existingGroup) throw new NotFoundException('Group does not exist');
 
-    if ((createProductDto.categories && createProductDto.price) || (!createProductDto.categories && !createProductDto.price))
-      throw new BadRequestException('Product should either have a price or an assigned category');
-
     let categoryList: Category[] | null = null;
-    if (createProductDto.categories) categoryList = createProductDto.categories.map((c) => new Category(c));
+    if (createProductDto.categories)
+      categoryList = createProductDto.categories.map((c) => {
+        const categoryItems = c?.categoryItems?.map((ci) => new CategoryItem(ci));
+
+        const category = new Category({ ...c, categoryItems });
+
+        return category;
+      });
 
     try {
       const product = new Product({ ...createProductDto, group: existingGroup, categories: categoryList });
@@ -59,9 +64,14 @@ export class ProductsService {
       throw new BadRequestException('Product should either have a price or an assigned category');
 
     let categoryList: Category[] | null = null;
-    if (updateProductDto.categories) {
-      categoryList = updateProductDto.categories.map((c) => new Category(c));
-    }
+    if (updateProductDto.categories)
+      categoryList = updateProductDto.categories.map((c) => {
+        const categoryItems = c?.categoryItems?.map((ci) => new CategoryItem(ci));
+
+        const category = new Category({ ...c, categoryItems });
+
+        return category;
+      });
 
     const updateProduct = {
       ...existingProduct,
